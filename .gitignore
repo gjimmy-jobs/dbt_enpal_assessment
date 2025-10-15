@@ -1,0 +1,43 @@
+# Python
+venv/
+env/
+*.pyc
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# dbt
+target/
+dbt_packages/
+logs/
+dbt_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# Environment variables
+.env
+.env.local
+
+# Compiled files
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
