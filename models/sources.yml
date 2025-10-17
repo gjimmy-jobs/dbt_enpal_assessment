@@ -5,4 +5,60 @@ sources:
     database: postgres
     schema: public
     tables:
-      - name: activity
+      - name: users
+        description: Pipedrive user accounts
+        columns:
+          - name: id
+            description: User ID (primary key)
+            data_type: integer
+          - name: name
+            description: User full name
+            data_type: string
+          - name: email
+            description: User email address
+            data_type: string
+          - name: modified
+            description: Last modification timestamp
+            data_type: timestamp
+
+      - name: fields
+        description: Custom field definitions
+        columns:
+          - name: ID
+            description: Field ID (primary key)
+            data_type: integer
+          - name: FIELD_KEY
+            description: Unique key identifier for the field
+            data_type: string
+          - name: NAME
+            description: Human-readable field name
+            data_type: string
+          - name: FIELD_VALUE_OPTIONS
+            description: Available options/values for the field
+            data_type: string
+
+      - name: stages
+        description: Deal pipeline stages
+        columns:
+          - name: stage_id
+            description: Stage ID (primary key)
+            data_type: integer
+          - name: stage_name
+            description: Stage name in the sales funnel
+            data_type: string
+
+      - name: deal_changes
+        description: Audit log of deal field changes
+        columns:
+          - name: deal_id
+            description: Deal ID (foreign key)
+            data_type: integer
+          - name: change_time
+            description: Timestamp when the change occurred
+            data_type: timestamp
+          - name: changed_field_key
+            description: Key of the field that was changed
+            data_type: string
+          - name: new_value
+            description: New value assigned to the field
+            data_type: string
