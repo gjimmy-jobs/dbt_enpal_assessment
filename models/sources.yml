@@ -11,12 +11,19 @@ sources:
           - name: id
             description: User ID (primary key)
             data_type: integer
+            tests:
+              - unique
+              - not_null
           - name: name
             description: User full name
             data_type: string
+            tests:
+              - not_null
           - name: email
             description: User email address
             data_type: string
+            tests:
+              - not_null
           - name: modified
             description: Last modification timestamp
             data_type: timestamp
@@ -27,9 +34,14 @@ sources:
           - name: ID
             description: Field ID (primary key)
             data_type: integer
+            tests:
+              - unique
+              - not_null
           - name: FIELD_KEY
             description: Unique key identifier for the field
             data_type: string
+            tests:
+              - not_null
           - name: NAME
             description: Human-readable field name
             data_type: string
@@ -43,9 +55,14 @@ sources:
           - name: stage_id
             description: Stage ID (primary key)
             data_type: integer
+            tests:
+              - unique
+              - not_null
           - name: stage_name
             description: Stage name in the sales funnel
             data_type: string
+            tests:
+              - not_null
 
       - name: deal_changes
         description: Audit log of deal field changes
@@ -53,12 +70,21 @@ sources:
           - name: deal_id
             description: Deal ID (foreign key)
             data_type: integer
+            tests:
+              - unique
+              - not_null
           - name: change_time
             description: Timestamp when the change occurred
             data_type: timestamp
+            tests:
+              - not_null
           - name: changed_field_key
             description: Key of the field that was changed
             data_type: string
+            tests:
+              - not_null
           - name: new_value
             description: New value assigned to the field
             data_type: string
+            tests:
+              - not_null
