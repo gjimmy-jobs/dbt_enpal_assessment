@@ -1,0 +1,211 @@
+version: 2
+
+models:
+  - name: int_full_funnel_steps
+    description: >
+      Master reference table mapping all funnel steps including both stage-based steps 
+      and activity-based steps (Sales Call 1 and Sales Call 2). This model creates a 
+      complete funnel hierarchy with proper ordering and foreign key references to both 
+      stages and activities.
+    columns:
+      - name: stage_id
+        description: Sequential order of the funnel step (1-11)
+        tests:
+          - not_null
+          - unique
+      - name: stage_step
+        description: Display identifier for the funnel step (e.g., '1', '2', '2.1', '3', '3.1')
+        tests:
+          - not_null
+      - name: stage_kpi_name
+        description: Human-readable name of the KPI/funnel step
+        tests:
+          - not_null
+      - name: stage_fk
+        description: Foreign key to stage_id in stages table (empty string for activity-based steps)
+      - name: activity_fk
+        description: Foreign key to activity type (empty string for stage-based steps, 'meeting' or 'sc_2' for activity-based)
+
+  - name: int_deal_normalized_stages
+    description: >
+      Normalized view of deal stage changes over time. Links deal stage transitions 
+      to the full funnel steps framework and aggregates to monthly grain for reporting.
+    columns:
+      - name: deal_id
+        description: Unique identifier for the deal
+        tests:
+          - not_null
+      - name: stage_id
+        description: Sequential funnel step order
+      - name: stage_step
+        description: Display identifier for the stage
+      - name: stage_kpi_name
+        description: Human-readable KPI name for the stage
+      - name: stage_start_ts
+        description: Timestamp when the deal entered this stage
+        tests:
+          - not_null
+      - name: stage_month
+        description: Month when the deal entered this stage (truncated to first of month)
+        tests:
+          - not_null
+
+  - name: int_deal_normalized_lost_reason
+    description: >
+      Normalized view of deal lost reasons with decoded human-readable labels.
+    columns:
+      - name: deal_id
+        description: Unique identifier for the deal
+        tests:
+          - not_null
+      - name: deal_change_ts
+        description: Timestamp when the deal was marked as lost
+        tests:
+          - not_null
+      - name: deal_lost_reason
+        description: Raw lost reason code from source system
+        tests:
+          - accepted_values:
+              values: 
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5  
+      - name: deal_lost_reason_name
+        description: Human-readable lost reason name
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Customer Not Ready', 'Pricing Issues', 'Unreachable Customer', 'Product Mismatch', 'Duplicate Entry']
+
+  - name: int_deal_normalized_users
+    description: >
+      Normalized view of deal user assignments over time, enriched with user details.
+    columns:
+      - name: deal_id
+        description: Unique identifier for the deal
+        tests:
+          - not_null
+      - name: deal_change_ts
+        description: Timestamp when the user assignment changed
+        tests:
+          - not_null
+      - name: deal_user_id
+        tests:
+          - not_null
+        description: ID of the user assigned to the deal
+      - name: deal_user_name
+        description: Name of the assigned user
+      - name: deal_user_email
+        description: Email of the assigned user
+
+  - name: int_deal_normalized_add_time
+    description: >
+      Normalized view capturing when deals were first created in the system.
+    columns:
+      - name: deal_id
+        description: Unique identifier for the deal
+        tests:
+          - not_null
+      - name: deal_change_ts
+        description: Timestamp of the change record
+        tests:
+          - not_null
+      - name: deal_add_time
+        description: Timestamp when the deal was added to the system
+        tests:
+          - not_null
+
+  - name: int_activities_normalized
+    description: >
+      Normalized view of activities enriched with activity type information.
+      Filters and prepares activity data for further analysis.
+    columns:
+      - name: activity_id
+        description: Unique identifier for the activity
+        tests:
+          - not_null
+          - unique
+      - name: is_activity_active
+        description: Boolean flag indicating if the activity type is active
+        tests:
+          - not_null
+      - name: activity_user
+        description: User assigned to the activity
+      - name: deal_id
+        description: Associated deal ID
+      - name: is_activity_done
+        description: Boolean flag indicating if the activity is completed
+        tests:
+          - not_null
+      - name: activity_due_date
+        description: Due date for the activity
+      - name: activity_type
+        description: Type of activity (e.g., 'meeting', 'sc_2')
+        tests:
+          - not_null
+
+  - name: int_activities_normalized_relevant
+    description: >
+      Enhanced activity view that links completed sales call activities 
+      (meetings and sc_2) to funnel steps. Used for tracking Sales Call 1 
+      and Sales Call 2 KPIs in the funnel.
+    columns:
+      - name: activity_id
+        description: Unique identifier for the activity
+        tests:
+          - not_null
+          - unique
+      - name: is_activity_active
+        description: Boolean flag - filtered to true only
+      - name: activity_user
+        description: User assigned to the activity
+      - name: deal_id
+        description: Associated deal ID
+      - name: is_activity_done
+        description: Boolean flag - filtered to true only
+      - name: activity_due_date
+        description: Due date for the activity
+      - name: activity_type
+        description: Type of activity - filtered to 'meeting' or 'sc_2'
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['meeting', 'sc_2']
+      - name: activity_due_month
+        description: Month of the activity due date (truncated to first of month)
+        tests:
+          - not_null
+      - name: stage_step
+        description: Display identifier linking activity to funnel step ('2.1' or '3.1')
+      - name: stage_id
+        description: Sequential funnel order for this activity type
+      - name: stage_kpi_name
+        description: KPI name ('Sales Call 1' or 'Sales Call 2')
+        tests:
+          - not_null
+
+  - name: int_months
+    description: >
+      Date dimension table generating a continuous series of months spanning 
+      the full range of activity and deal change data. Used as a spine for 
+      monthly reporting to ensure all months are represented.
+    columns:
+      - name: dt_month
+        description: First day of the month (date dimension primary key)
+        tests:
+          - not_null
+          - unique
+      - name: dt_year
+        description: Year component
+        tests:
+          - not_null
+      - name: dt_month_num
+        description: Month number (1-12)
+        tests:
+          - not_null
+      - name: dt_month_string
+        description: Month in YYYY-MM string format for display
+        tests:
+          - not_null
