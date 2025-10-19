@@ -1,0 +1,157 @@
+
+version: 2
+
+models:
+  - name: stg_users
+    description: Cleaned and standardized user data
+    columns:
+      - name: user_id
+        description: User ID (primary key)
+        data_type: integer
+        tests:
+          - unique
+          - not_null
+      - name: user_name
+        description: User full name
+        data_type: string
+        tests:
+        - not_null
+      - name: user_email
+        description: User email address
+        data_type: string
+        tests:
+        - not_null
+      - name: user_modified_ts
+        description: Last modification timestamp
+        data_type: timestamp
+        tests:
+        - not_null
+
+  - name: stg_deal_fields
+    description: Cleaned field definitions
+    columns:
+      - name: field_id
+        description: Field ID (primary key)
+        data_type: integer
+        tests:
+          - unique
+          - not_null
+      - name: field_key
+        description: Unique key identifier for the field
+        data_type: string
+        tests:
+        - not_null
+      - name: field_name
+        description: Human-readable field name
+        data_type: string
+        tests:
+        - not_null
+      - name: field_value_options
+        description: Available options/values for the field
+        data_type: string
+
+  - name: stg_deal_stages
+    description: Deal pipeline stages
+    columns:
+      - name: stage_id
+        description: Stage ID (primary key)
+        data_type: integer
+        tests:
+          - unique
+          - not_null
+      - name: stage_name
+        description: Stage name in the sales funnel
+        data_type: string
+        tests:
+        - not_null
+
+  - name: stg_deal_changes
+    description: Audit log of deal field changes
+    columns:
+      - name: deal_id
+        description: Deal ID
+        data_type: integer
+        tests:
+        - not_null
+      - name: deal_change_time
+        description: Timestamp when the change occurred
+        data_type: timestamp
+        tests:
+        - not_null
+      - name: deal_changed_field
+        description: Key of the field that was changed
+        data_type: string
+        tests:
+        - not_null
+      - name: deal_field_new_value
+        description: New value assigned to the field
+        data_type: string
+        tests:
+        - not_null
+
+  - name: stg_activities
+    description: Cleaned sales activities and tasks
+    columns:
+      - name: activity_id
+        description: Activity ID (primary key)
+        data_type: integer
+        tests:
+          - unique
+          - not_null
+      - name: activity_type
+        description: Activity type
+        data_type: string
+        tests:
+        - not_null
+      - name: activity_user
+        description: User ID the activity is assigned to
+        data_type: integer
+        tests:
+        - not_null
+        - relationships:
+            field: ref('public_pipedrive_analytics', 'stg_users')
+            to: user_id
+      - name: deal_id
+        description: Deal ID associated with the activity
+        data_type: integer
+        tests:
+          - not_null
+      - name: is_activity_done
+        description: Whether the activity is completed
+        data_type: string
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['TRUE','FALSE']
+      - name: activity_due_date
+        description: Due date/time for the activity
+        data_type: timestamp
+        tests:
+          - not_null
+
+  - name: stg_activity_types
+    description: Available activity type definitions
+    columns:
+      - name: activity_type_id
+        description: Activity type ID (primary key)
+        data_type: integer
+        tests:
+          - unique
+          - not_null
+      - name: activity_type_name
+        description: Human-readable activity type name
+        data_type: string
+        tests:
+          - not_null
+      - name: activity_is_active
+        description: Whether the activity type is active
+        data_type: string
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['yes', 'no']
+      - name: activity_type
+        description: Category of activity type
+        data_type: string
+        tests:
+          - not_null
