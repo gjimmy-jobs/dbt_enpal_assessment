@@ -41,3 +41,7 @@ Desktop.ini
 *.db
 *.sqlite
 *.sqlite3
+
+# SQLFluff
+.sqlfluff_cache/
+.sqlfluffignore_cache/
