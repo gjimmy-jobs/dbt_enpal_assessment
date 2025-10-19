@@ -27,6 +27,8 @@ sources:
           - name: modified
             description: Last modification timestamp
             data_type: timestamp
+            tests:
+            - not_null
 
       - name: fields
         description: Custom field definitions
@@ -41,10 +43,14 @@ sources:
             description: Unique key identifier for the field
             data_type: string
             tests:
+              - unique
               - not_null
           - name: NAME
             description: Human-readable field name
             data_type: string
+            tests:
+              - unique
+              - not_null
           - name: FIELD_VALUE_OPTIONS
             description: Available options/values for the field
             data_type: string
@@ -71,7 +77,6 @@ sources:
             description: Deal ID (foreign key)
             data_type: integer
             tests:
-              - unique
               - not_null
           - name: change_time
             description: Timestamp when the change occurred
@@ -83,8 +88,81 @@ sources:
             data_type: string
             tests:
               - not_null
+              - relationships:
+                  field: source('postgres_public', 'fields')
+                  to: FIELD_KEY
           - name: new_value
             description: New value assigned to the field
             data_type: string
+            tests:
+              - not_null
+      - name: activity_types
+        description: Available activity type definitions
+        columns:
+          - name: id
+            description: Activity type ID (primary key)
+            data_type: integer
+            tests:
+              - unique
+              - not_null
+          - name: name
+            description: Human-readable activity type name
+            data_type: string
+            tests:
+              - not_null
+          - name: active
+            description: Whether the activity type is active
+            data_type: string
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['yes','no']
+          - name: type
+            description: Category of activity type
+            data_type: string
+            tests:
+              - not_null
+              - unique
+
+      - name: activity
+        description: Sales activities and tasks
+        columns:
+          - name: activity_id
+            description: Activity ID (primary key)
+            data_type: integer
+            tests:
+              - unique
+              - not_null
+          - name: type
+            description: Activity type (e.g., follow_up, call)
+            data_type: string
+            tests:
+              - not_null
+              - relationships:
+                  field: source('postgres_public', 'activity_types')
+                  to: type
+          - name: assigned_to_user
+            description: User ID the activity is assigned to (foreign key)
+            data_type: integer
+            tests:
+              - not_null
+              - relationships:
+                  field: source('postgres_public', 'users')
+                  to: id
+          - name: deal_id
+            description: Deal ID associated with the activity (foreign key)
+            data_type: integer
+            tests:
+              - not_null
+          - name: done
+            description: Whether the activity is completed
+            data_type: string
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['TRUE', 'FALSE']
+          - name: due_to
+            description: Due date/time for the activity
+            data_type: timestamp
             tests:
               - not_null
