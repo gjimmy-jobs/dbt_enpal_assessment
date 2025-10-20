@@ -1,3 +1,4 @@
+-- Activities enriched with activity type metadata
 SELECT
     act.activity_id,
     lower(act_ty.is_activity_active) = 'yes' AS is_activity_active,

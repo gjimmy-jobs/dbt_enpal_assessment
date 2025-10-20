@@ -1,4 +1,6 @@
+-- Monthly sales funnel reporting: deal counts by funnel step and month
 WITH stages AS (
+    -- Aggregate stage-based funnel steps by month
     SELECT
         to_char(ds.stage_month, 'YYYY-MM') AS dt_month_string,
         ds.stage_kpi_name,
@@ -9,6 +11,7 @@ WITH stages AS (
 ),
 
 activities AS (
+    -- Aggregate activity-based funnel steps (Sales Call 1 & 2) by month
     SELECT
         to_char(act.activity_due_month, 'YYYY-MM') AS dt_month_string,
         act.stage_kpi_name,
@@ -19,6 +22,7 @@ activities AS (
 ),
 
 months_stages AS (
+    -- Create complete spine of all month-stage combinations
     SELECT
         m.dt_month_string,
         s.stage_id

@@ -1,3 +1,4 @@
+-- Deal stage transitions linked to funnel steps
 SELECT
     dc.deal_id,
     ffs.stage_id,

@@ -1,3 +1,4 @@
+-- Master funnel step reference combining stages and activity-based steps
 WITH base_stages AS (
     SELECT
         stage_id,
@@ -15,6 +16,7 @@ with_steps AS (
     FROM base_stages
 ),
 
+-- Add Sales Call 1 (meeting) and Sales Call 2 (sc_2) as activity-based steps
 add_sales_calls AS (
     SELECT * FROM with_steps
 
@@ -37,6 +39,7 @@ add_sales_calls AS (
         'sc_2' AS activity_fk
 ),
 
+-- Renumber to create sequential stage_id
 renumbered AS (
     SELECT
         stage_step,

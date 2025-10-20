@@ -1,3 +1,4 @@
+-- Deal creation timestamp
 SELECT
     deal_id,
     deal_change_ts,

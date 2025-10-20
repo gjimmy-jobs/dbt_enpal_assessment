@@ -1,3 +1,4 @@
+-- Date spine: continuous month series from min to max date in source data
 WITH date_range AS (
     SELECT
         MIN(min_date) AS min_date,

@@ -1,3 +1,4 @@
+-- Decode lost reason codes to human-readable names
 SELECT
     deal_id,
     deal_change_ts,

@@ -1,3 +1,4 @@
+-- Completed sales call activities (meeting, sc_2) linked to funnel steps
 SELECT
     act.activity_id,
     act.deal_id,

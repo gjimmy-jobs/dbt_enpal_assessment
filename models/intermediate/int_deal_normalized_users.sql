@@ -1,3 +1,4 @@
+-- Deal user assignments enriched with user details
 SELECT
     dc.deal_id,
     dc.deal_change_ts,
